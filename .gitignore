@@ -9,3 +9,7 @@ obj/
 bin/ 
 obj/ 
 *.user 
+.vs/ 
+bin/ 
+obj/ 
+*.user 
