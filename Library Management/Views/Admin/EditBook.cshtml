@@ -1,0 +1,37 @@
+﻿@model Library_Management.Models.Dtos.BookDto
+
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<h2>Edit Book</h2>
+
+<form asp-action="EditBook" asp-route-id="@ViewBag.BookId" method="post" class="mt-4">
+    <div class="mb-3">
+        <label for="title" class="form-label"></label>
+        <input type="text" name="title" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="author" class="form-label"></label>
+        <input type="text" name="author" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="ISBN" class="form-label"></label>
+        <input type="text" name="ISBN" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="totalQuantity" class="form-label"></label>
+        <input type="number" name="totalQuantity" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="rentPrice" class="form-label"></label>
+        <input type="number" name="rentPrice" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Book</button>
+    <a href="@Url.Action("BookList", "Admin")" class="btn btn-secondary ms-2">Cancel</a>
+</form>

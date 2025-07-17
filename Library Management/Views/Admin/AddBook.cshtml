@@ -1,0 +1,37 @@
+﻿@model Library_Management.Models.Dtos.BookDto
+
+@{
+    ViewData["Title"] = "Add Book";
+}
+
+<h2>Add New Book</h2>
+    //TODO: ADD ACTION AND CONTROLLER
+<form action="@Url.Action("","")" method="post" class="mt-4">  @*TODO: ADD METHOD AND CONTROLLER*@
+    <div class="mb-3">
+        <label for="title" class="form-label"></label>
+        <input for="title" name="title" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="author" class="form-label"></label>
+        <input for="author" name="Author" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="ISBN" class="form-label"></label>
+        <input for="ISBN" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="totalQuantity" class="form-label"></label>
+        <input for="totalQuantity" type="number" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="rentPrice" class="form-label"></label>
+        <input for="rentPrice" type="number" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Add Book</button>
+    <a href="@Url.Action("", "")" class="btn btn-secondary ms-2">Cancel</a>
+</form>

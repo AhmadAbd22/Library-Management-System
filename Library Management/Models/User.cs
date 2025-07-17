@@ -11,9 +11,6 @@ namespace Library_Management.Models
         public string lastName { get; set; } = string.Empty;
 
         [Column(TypeName = "nvarchar(255)")]
-        public string username { get; set; } = string.Empty;
-
-        [Column(TypeName = "nvarchar(255)")]
         public string email { get; set; } = string.Empty;
 
         [Column(TypeName = "nvarchar(max)")]

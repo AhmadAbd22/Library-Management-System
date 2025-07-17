@@ -2,6 +2,65 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+<div class="bg-dark py-5 text-white text-center">
+    <div class="container">
+        <h2 class="display-5">Library Management System</h2>
+        <p class="lead">Manage your library with ease</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 bg-light p-5 rounded-4 shadow">
+            <h4 class="mb-4 text-center">Create an Account</h4>
+
+            <form action="@Url.Action("signup","SignUp")" method="post">
+                <div class="mb-3">
+                    <label for="FirstName" class="form-label">First Name</label>
+                    <input type="text" name="Firstname" class="form-control" placeholder="First name" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="LastName" class="form-label">Last Name</label>
+                    <input type="text" name="Lastname" class="form-control" placeholder="Last name" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="Phone" class="form-label">Phone Number</label>
+                    <input type="tel" name="Phone" class="form-control" placeholder="Phone Number" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="Address" class="form-label">Address</label>
+                    <input type="text" name="address" class="form-control" placeholder="Address" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="City" class="form-label">City</label>
+                    <input type="text" name="City" class="form-control" placeholder="City" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" name="Email" class="form-control" placeholder="Email" required />
+                </div>
+
+                <div class="mb-4">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="password" name="Password" class="form-control" placeholder="Password" required />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <p class="text-muted">
+                        Already have an account?
+                        <a href="@Url.Action("login", "Login")" class="text-decoration-none">Login</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

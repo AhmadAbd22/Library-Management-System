@@ -144,14 +144,17 @@ namespace Library_Management.Models.Repositories
 
 public class UserRepo : IUserRepo
     {
-        private readonly LibraryManagementDbContext context;
-
+        private readonly LibraryManagementDbContext _context;
+        public UserRepo(LibraryManagementDbContext context)
+        {
+            _context = context;
+        }
         public async Task<bool> AddUser(User user)
         {
             try
             {
-                context.Users.Add(user);
-                await context.SaveChangesAsync();
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch
@@ -182,7 +185,7 @@ public class UserRepo : IUserRepo
 
         public async Task<IEnumerable<Book>> GetActiveBooks()
         {
-            return await context.Books
+            return await _context.Books
                 .Where(b => b.isActive == (int)enumActiveStatus.Active)
                 .OrderByDescending(b => b.createdAt)
                 .ToListAsync();
@@ -196,10 +199,12 @@ public class UserRepo : IUserRepo
 
         public async Task<User?> GetUserByEmail(string email)
         {
-            return await context.Users.FirstOrDefaultAsync(x => x.email!.ToLower().Equals(email.Trim(), StringComparison.CurrentCultureIgnoreCase) && x.isActive == (int)enumActiveStatus.Active);
-        }
+        return await _context.Users.FirstOrDefaultAsync(
+            x => x.email!.ToLower() == email.Trim().ToLower()
+              && x.isActive == (int)enumActiveStatus.Active);
+    }
 
-        public Task<User?> GetUserById(Guid id)
+    public Task<User?> GetUserById(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -219,14 +224,13 @@ public class UserRepo : IUserRepo
             if (user == null || user.Id == Guid.Empty)
                 return false;
 
-            var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Id == user.Id && u.isActive == (int)enumActiveStatus.Active);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id && u.isActive == (int)enumActiveStatus.Active);
             if (existingUser == null)
                 return false;
 
             // Update fields
             existingUser.firstName = user.firstName;
             existingUser.lastName = user.lastName;
-            existingUser.username = user.username;
             existingUser.email = user.email;
             existingUser.password = user.password;
             existingUser.phoneNumber = user.phoneNumber;
@@ -237,8 +241,8 @@ public class UserRepo : IUserRepo
 
             try
             {
-                context.Users.Update(existingUser);
-                await context.SaveChangesAsync();
+                _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch

@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2 class="text-center mb-4">📚 Admin Dashboard</h2>
+
+<div class="d-flex flex-column gap-3">
+
+    <a href="@Url.Action("BookList", "Admin")" class="btn btn-outline-primary btn-lg w-100">
+         Manage Books
+    </a>
+
+    <a href="@Url.Action("AddBook", "Admin")" class="btn btn-outline-success btn-lg w-100">
+        Add New Book
+    </a>
+
+    <form action="@Url.Action("FilterBooks", "Admin")" method="get" class="d-flex">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search books..." />
+        <button type="submit" class="btn btn-outline-secondary">Search</button>
+    </form>
+
+</div>

@@ -19,8 +19,14 @@ namespace Library_Management.Controllers.User
                 _borrowRepo = borrowRepo;
             }
 
+            [HttpGet]
+            public IActionResult Index()
+            {
+                return View();
+            }
+
             // GET: Show all active books
-            public async Task<IActionResult> Index()
+            public async Task<IActionResult> ShowBooks()
             {
                 var books = await _bookRepo.GetActiveBookList();
                 return View(books);
@@ -64,4 +70,5 @@ namespace Library_Management.Controllers.User
     }
 
 }
-}
+
+    

@@ -1,4 +1,6 @@
+using Library_Management.Models;
 using Library_Management.Models.Context;
+using Library_Management.Models.Repositories;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<LibraryManagementDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddHttpContextAccessor();
+
+
 
 var app = builder.Build();
 

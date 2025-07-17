@@ -4,6 +4,7 @@ using Library_Management.Models.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Library_Management.Models.Dtos;
 
+
 namespace Library_Management.Controllers.Auth
 {
     public class LoginController : Controller
@@ -20,13 +21,13 @@ namespace Library_Management.Controllers.Auth
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(UserLoginDto login)
+        public async Task<IActionResult> Login(LoginDto login)
         {
             if (!ModelState.IsValid)
             {
                 return View(login);
             }
-            var user = await _userRepo.GetUserByEmail(login.email);
+            var user = await _userRepo.GetUserByEmail(login.Email);
             if (user == null || user.isActive != (int)enumActiveStatus.Active)
             {
                 TempData["Error"] = "Incorrect Email or Password.";
@@ -34,12 +35,12 @@ namespace Library_Management.Controllers.Auth
             }
 
             //compare password and email
-            if (user.password == StringCipher.EncryptString(login.password))
+            if (user.password == StringCipher.EncryptString(login.Password))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "UserHome");
             }
             TempData["Error"] = "Incorrect Email or Password.";
-            return View(login);
+            return RedirectToAction("Index", "UserHome");
         }
     }
 }   
