@@ -66,7 +66,7 @@ namespace Library_Management.Models.Repositories
                     bookId = bookId,
                     userId = userId,
                     rentDate = DateTime.UtcNow,
-                    rentPrice = 0, // You can decide how to assign rent price
+                    rentPrice = 0, 
                     isActive = (int)enumActiveStatus.Active,
                     createdAt = DateTime.UtcNow
                 };
@@ -75,6 +75,7 @@ namespace Library_Management.Models.Repositories
 
                 _context.BorrowedBooks.Add(borrow);
                 _context.Books.Update(book);
+                await _context.SaveChangesAsync();
                 await _context.SaveChangesAsync();
 
                 return true;
@@ -125,7 +126,6 @@ namespace Library_Management.Models.Repositories
         public async Task<IEnumerable<BorrowedBooks>> GetAllBorrows()
         {
             return await _context.BorrowedBooks
-                .Include(x => x.book)
                 .Include(x => x.book)
                 .Where(x => x.isActive == (int)enumActiveStatus.Active)
                 .ToListAsync();
@@ -204,17 +204,17 @@ public class UserRepo : IUserRepo
               && x.isActive == (int)enumActiveStatus.Active);
     }
 
-    public Task<User?> GetUserById(Guid id)
+    public async Task<User?> GetUserById(Guid id)
         {
-            throw new NotImplementedException();
+        return await _context.Users.FirstOrDefaultAsync(x => x.Id == id && x.isActive == (int)enumActiveStatus.Active);
         }
 
-        public Task<User?> GetUserByLogin(string email)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<User?> GetUserByLogin(string email)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.email == email && u.isActive == (int)enumActiveStatus.Active);
+    }
 
-        public Task<bool> IsUserValidate(Guid id)
+    public Task<bool> IsUserValidate(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -258,13 +258,17 @@ public class UserRepo : IUserRepo
     }
 
 
-    //BOOK
+//BOOK
 
-    public class BookRepo : IBookRepo
+public class BookRepo : IBookRepo
     {
-        private readonly LibraryManagementDbContext context;
+    private readonly LibraryManagementDbContext _context;
 
-        public async Task<bool> AddBook(Book book)
+    public BookRepo(LibraryManagementDbContext context)
+    {
+        _context = context;
+    }
+    public async Task<bool> AddBook(Book book)
         {
             try
             {
@@ -273,8 +277,8 @@ public class UserRepo : IUserRepo
                 book.Id = Guid.NewGuid();
                 book.isActive = (int)enumActiveStatus.Active;
                 book.createdAt = DateTime.UtcNow;
-                context.Books.Add(book);
-                context.SaveChanges();
+                _context.Books.Add(book);
+                _context.SaveChanges();
                 return await Task.FromResult(true);
             }
             catch
@@ -287,7 +291,7 @@ public class UserRepo : IUserRepo
         {
             try
             {
-                var book = await context.Books
+                var book = await _context.Books
                     .FirstOrDefaultAsync(b => b.title.ToLower().Trim() == title.ToLower().Trim()
                                            && b.isActive == (int)enumActiveStatus.Active);
 
@@ -297,8 +301,8 @@ public class UserRepo : IUserRepo
                 book.isActive = (int)enumActiveStatus.Deleted;
                 book.updatedAt = DateTime.UtcNow;
 
-                context.Books.Update(book);
-                await context.SaveChangesAsync();
+                _context.Books.Update(book);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch
@@ -311,13 +315,13 @@ public class UserRepo : IUserRepo
         {
             try
             {
-                var book = context.Books.FirstOrDefault(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
+                var book = _context.Books.FirstOrDefault(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
                 if (book == null)
                     return Task.FromResult(false);
                 book.isActive = (int)enumActiveStatus.Deleted;
                 book.updatedAt = DateTime.UtcNow;
-                context.Books.Update(book);
-                context.SaveChanges();
+                _context.Books.Update(book);
+                _context.SaveChanges();
                 return Task.FromResult(true);
             }
             catch
@@ -326,26 +330,28 @@ public class UserRepo : IUserRepo
             }
         }
 
-        public Task<IEnumerable<Book>> GetActiveBookList()
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<IEnumerable<Book>> GetActiveBookList()
+    {
+        return await _context.Books.Where(b => b.isActive == (int)enumActiveStatus.Active).ToListAsync();
+    }
 
-        public Task<IEnumerable<Book>> GetActiveBookListBySearch(string searchValue)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<IEnumerable<Book>> GetActiveBookListBySearch(string searchValue)
+    {
+        searchValue = searchValue.Trim().ToLower();
+        var result = await _context.Books.Where(b => b.isActive == (int)enumActiveStatus.Active && b.title.ToLower().Contains(searchValue)).ToListAsync();
+        return result;
+    }
 
         public Task<string?> GetActiveBooks()
         {
-            throw new NotImplementedException();
+        return (Task<string?>)_context.Books.Where(b => b.isActive == (int)enumActiveStatus.Active);
         }
 
         public async Task<Book?> GetBookById(Guid id)
         {
             try
             {
-                return await context.Books.FirstOrDefaultAsync(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
+                return await _context.Books.FirstOrDefaultAsync(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
             }
             catch
             {

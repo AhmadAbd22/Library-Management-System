@@ -13,6 +13,8 @@ namespace Library_Management.Models
         [Required]
         public Guid userId { get; set; }
         [ForeignKey("userId")]
+
+        public bool IsReturned { get; set; }
         public DateTime rentDate { get; set; }
         public DateTime returnDate { get; set; }
 

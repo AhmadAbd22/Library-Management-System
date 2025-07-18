@@ -1,12 +1,14 @@
-﻿using Library_Management.Controllers.Auth;
+﻿using Library_Management.Controllers;
 using Library_Management.Models;
 using Library_Management.Models.Context;
 using Library_Management.Models.Dtos;
 using Library_Management.Models.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library_Management.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IBookRepo _bookRepo;
@@ -14,6 +16,11 @@ namespace Library_Management.Controllers
         public AdminController(IBookRepo bookRepo)
         {
             _bookRepo = bookRepo;
+        }
+
+        public IActionResult AdminHome()
+        {
+            return View();
         }
 
         // GET: Add Book Form
@@ -70,7 +77,7 @@ namespace Library_Management.Controllers
                 totalQuantity = book.quantity
             };
 
-            ViewBag.BookId = id; // For sending id to the view
+            ViewBag.BookId = id;
             return View(dto);
         }
 

@@ -72,6 +72,9 @@ namespace Library_Management.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("actionBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -161,6 +164,20 @@ namespace Library_Management.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            createdAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            email = "admin1@gmail.com",
+                            firstName = "Admin",
+                            isActive = 1,
+                            lastName = "Bhai",
+                            password = "123",
+                            phoneNumber = "12341234567",
+                            role = 1
+                        });
                 });
 
             modelBuilder.Entity("Library_Management.Models.BorrowedBooks", b =>

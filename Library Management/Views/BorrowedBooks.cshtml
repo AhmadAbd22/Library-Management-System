@@ -1,0 +1,57 @@
+﻿@model List<Library_Management.Models.BorrowedBooks>
+@{
+    ViewData["Title"] = "My Borrowed Books";
+}
+
+<h2 class="mb-4">My Borrowed Books</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Borrowed On</th>
+                <th>Returned?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var borrow in Model)
+            {
+                <tr>
+                    <td>@borrow.book?.title</td>
+                    <td>@borrow.rentDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        @if (borrow.IsReturned)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">No</span>
+                        }
+                    </td>
+                    <td>
+                        @if (borrow.IsReturned)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">No</span>
+                        }
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+    <p class="text-muted">You have not borrowed any books yet.</p>
+}
+
+
+

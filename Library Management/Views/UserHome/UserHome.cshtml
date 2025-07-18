@@ -1,0 +1,63 @@
+﻿@model List<Library_Management.Models.Book>
+@{
+    ViewData["Title"] = "Available Books";
+}
+
+<h1 class="text-left mb-4">Home Page</h1>
+
+<h4>Available Books</h4>
+
+<form method="get" class="d-flex mb-4" role="search" action="@Url.Action("UserHome", "UserHome")">
+    <input type="text" name="search" placeholder="Search books..." class="form-control rounded-pill w-50" />
+    <button type="submit" class="btn btn-primary ms-3 rounded-pill">Search</button>
+</form>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning">No books found matching your search.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    <td>@book.title</td>
+                    <td>@book.author</td>
+                    <td>@book.rentPrice Rs</td>
+                    <td>
+                        <form method="post" action="@Url.Action("BorrowBook", "UserHome")">
+                            <input type="hidden" name="bookId" value="@book.Id" />
+                            <button type="submit" class="btn btn-success btn-sm rounded-pill">
+                                Borrow
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-4">
+    <a href="@Url.Action("BorrowedBooks", "UserHome")" class="btn btn-outline-primary rounded-pill">
+        View Borrowed Books
+    </a>
+</div>

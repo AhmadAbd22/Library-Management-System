@@ -11,5 +11,7 @@ namespace Library_Management.Models.Dtos
         public string author { get; set; }
         public int totalQuantity { get; set; }
         public string ISBN { get; set; }
+
+        public int rentPrice { get; set; }
     }
 }

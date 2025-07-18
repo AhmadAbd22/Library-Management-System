@@ -2,36 +2,46 @@
 
 @{
     ViewData["Title"] = "Add Book";
+    ViewData["Successful"] = "Book Added Successfully";
 }
 
 <h2>Add New Book</h2>
-    //TODO: ADD ACTION AND CONTROLLER
-<form action="@Url.Action("","")" method="post" class="mt-4">  @*TODO: ADD METHOD AND CONTROLLER*@
-    <div class="mb-3">
+<form action="@Url.Action("AddBook","Admin")" method="post" class="mt-4"> 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    <div>
         <label for="title" class="form-label"></label>
-        <input for="title" name="title" class="form-control" />
+        <input for="title" name="title" class="form-control" placeholder="Book Title" />
     </div>
 
     <div class="mb-3">
         <label for="author" class="form-label"></label>
-        <input for="author" name="Author" class="form-control" />
+        <input for="author" name="Author" class="form-control" placeholder="Author" />
     </div>
 
     <div class="mb-3">
         <label for="ISBN" class="form-label"></label>
-        <input for="ISBN" class="form-control" />
+        <input for="ISBN" class="form-control" placeholder="ISBN" />
     </div>
 
     <div class="mb-3">
         <label for="totalQuantity" class="form-label"></label>
-        <input for="totalQuantity" type="number" class="form-control" />
+        <input for="totalQuantity" type="number" class="form-control"  placeholder="Quantity"/>
     </div>
 
     <div class="mb-3">
         <label for="rentPrice" class="form-label"></label>
-        <input for="rentPrice" type="number" class="form-control" />
+        <input for="rentPrice" type="number" class="form-control" placeholder="Rent Price" />
     </div>
 
     <button type="submit" class="btn btn-success">Add Book</button>
-    <a href="@Url.Action("", "")" class="btn btn-secondary ms-2">Cancel</a>
+    <a href="@Url.Action("AddBook", "Admin")" class="btn btn-secondary ms-4">Cancel</a>
+
 </form>
+
+<div class="alert-light">
+    <a href="@Url.Action("AdminHome", "Admin")" class="btn btn-secondary mt-4">
+    </a>
+</div>

@@ -1,6 +1,8 @@
+using Library_Management.HelpingClasses;
 using Library_Management.Models;
 using Library_Management.Models.Context;
 using Library_Management.Models.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +12,17 @@ builder.Services.AddDbContext<LibraryManagementDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IBorrowRepo, BorrowRepo>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<GeneralPurpose>();
+builder.Services.AddScoped<IBookRepo, BookRepo>();
 
-
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // or your actual path
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
 
 var app = builder.Build();
 
@@ -32,7 +42,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

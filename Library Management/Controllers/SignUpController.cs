@@ -3,8 +3,9 @@ using Library_Management.Models;
 using Library_Management.Models.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Library_Management.Models.Dtos;
+using Library_Management.HelpingClasses;
 
-namespace Library_Management.Controllers.Auth
+namespace Library_Management.Controllers
 {
     public class SignUpController : Controller
     {
@@ -15,6 +16,7 @@ namespace Library_Management.Controllers.Auth
         }
 
         //Sign Up//
+
         public IActionResult SignUp()
         {
             return View();
@@ -30,7 +32,7 @@ namespace Library_Management.Controllers.Auth
                 ModelState.AddModelError("Email", "Email is already registered.");
                 return View(signup);
             }
-            var user = new Library_Management.Models.User  //create new user
+            var user = new Models.User  //create new user
             {
                 Id = Guid.NewGuid(),
                 email = signup.Email,

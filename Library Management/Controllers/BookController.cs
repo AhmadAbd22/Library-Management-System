@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Library_Management.Controllers.User
+namespace Library_Management.Controllers
 {
-    public class UserHomeController : Controller
+    public class BookController : Controller
     {
-        [Authorize(Roles = "User")]
         public class HomeController : Controller
         {
             private readonly IBookRepo _bookRepo;
@@ -32,7 +31,7 @@ namespace Library_Management.Controllers.User
                 return View(books);
             }
 
-            // GET: Search active books
+            // GET: Search active booksS
             [HttpGet]
             public async Task<IActionResult> Search(string search)
             {

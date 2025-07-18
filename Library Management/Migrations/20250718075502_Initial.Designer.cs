@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Library_Management.Migrations
 {
     [DbContext(typeof(LibraryManagementDbContext))]
-    [Migration("20250715030250_Library Management")]
-    partial class LibraryManagement
+    [Migration("20250718075502_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,10 @@ namespace Library_Management.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("actionBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -47,15 +51,15 @@ namespace Library_Management.Migrations
                     b.Property<int>("isActive")
                         .HasColumnType("int");
 
-                    b.Property<string>("isbn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("quantity")
                         .HasColumnType("int");
 
                     b.Property<int>("rentPrice")
                         .HasColumnType("int");
+
+                    b.Property<string>("title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("updatedAt")
                         .HasColumnType("datetime2");
@@ -70,6 +74,9 @@ namespace Library_Management.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("actionBy")
                         .HasColumnType("uniqueidentifier");
@@ -114,38 +121,24 @@ namespace Library_Management.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<Guid?>("actionBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("city")
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<DateTime?>("createdAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("deletedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("firstName")
                         .IsRequired()
@@ -158,12 +151,36 @@ namespace Library_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("phoneNumber")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("role")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("updatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            createdAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            email = "admin1@gmail.com",
+                            firstName = "Admin",
+                            isActive = 1,
+                            lastName = "Bhai",
+                            password = "123",
+                            phoneNumber = "12341234567",
+                            role = 1
+                        });
                 });
 
             modelBuilder.Entity("Library_Management.Models.BorrowedBooks", b =>

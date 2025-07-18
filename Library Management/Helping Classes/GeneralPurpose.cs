@@ -3,6 +3,7 @@ using Library_Management.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Library_Management.Models.Dtos;
+using Library_Management.Models.Context;
 
 namespace Library_Management.HelpingClasses
 {
@@ -48,38 +49,29 @@ namespace Library_Management.HelpingClasses
             return loggedInUser;
         }
 
-        public async Task<bool> SetUserClaims(User user)
+        public async Task SetUserClaims(User user)
         {
-            try
+            var claims = new List<Claim>
             {
-                //var baseUri = GetFilePath(user.Id.ToString());
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.email),
+                new Claim(ClaimTypes.Role, ((enumRole)user.role).ToString())
+            };
 
-                List<Claim> claims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.Sid, user.Id.ToString()),
-                    new Claim("EncId", user.Id.ToString()),
-                    new Claim("UserName", user.firstName + " " + user.lastName),
-                    new Claim(ClaimTypes.Email, user.email),
-                    new Claim("Role", user.role.ToString()),
-                };
-
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
-
-                await hcontext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    principal,
-                    new AuthenticationProperties { IsPersistent = true }
-                );
-
-                return true;
-            }
-            catch
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
             {
-                return false;
-            }
+                IsPersistent = true,
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(60)
+            };
+
+            await hcontext.SignInAsync( 
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
         }
+
+
 
         public static DateTime DateTimeNow()
         {
