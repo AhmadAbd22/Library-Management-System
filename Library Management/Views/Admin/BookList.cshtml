@@ -7,44 +7,62 @@
 <h2 class="text-center">Admin - Manage Books</h2>
 
 <div class="mb-4 text-end">
-    <form action="@Url.Action("ShowBooks","Book")" method="get" class="d-inline-flex">
+    <form action="@Url.Action("FilterBooks", "Admin")" method="get" class="d-inline-flex">
         <input type="text" name="search" class="form-control me-2" placeholder="Search by Title or Author" />
         <button type="submit" class="btn btn-outline-secondary">Search</button>
     </form>
-    <a href="@Url.Action("", "")" class="btn btn-primary ms-3">+ Add New Book</a>
+    <a href="@Url.Action("AddBook", "Admin")" class="btn btn-primary ms-3">+ Add New Book</a>
 </div>
 
-@if (TempData["Error"] != null)
+@if (!Model.Any())
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-warning text-center">No books found matching your search.</div>
 }
-
-<table class="table table-bordered table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>ISBN</th>
-            <th>Quantity</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model)
-        {
+else
+{
+    <table class="table table-bordered">
+        <thead class="table-dark">
             <tr>
-                <td>@book.title</td>
-                <td>@book.author</td>
-                <td>@book.ISBN</td>
-                <td>@book.quantity</td>
-                <td>@book.rentPrice</td>
-                <td>
-                    <a href="@Url.Action("", "", new { id = book.Id })" class="btn btn-sm btn-warning">Edit</a>
-                    <form action="@Url.Action("","")" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
-                    </form>
-                </td>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Quantity</th>
+                <th>Rent Price</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    <td>@book.title</td>
+                    <td>@book.author</td>
+                    <td>@book.ISBN</td>
+                    <td>@book.quantity</td>
+                    <td>@book.rentPrice</td>
+                    <td>
+                        @if (book.isActive == 1)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else if (book.isActive == 2)
+                        {
+                            <span class="badge bg-warning">Pending</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Deleted</span>
+                        }
+                    </td>
+                    <td>
+                        <a href="@Url.Action("EditBook", "Admin", new { id = book.Id })" class="btn btn-sm btn-warning">Edit</a>
+                        <form action="@Url.Action("DeleteBook", "Admin", new { id = book.Id })" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

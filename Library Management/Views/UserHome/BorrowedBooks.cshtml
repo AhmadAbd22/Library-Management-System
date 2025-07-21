@@ -13,6 +13,7 @@
                 <th>Book Title</th>
                 <th>Borrowed On</th>
                 <th>Returned?</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -32,16 +33,18 @@
                         }
                     </td>
                     <td>
-                        @if (borrow.IsReturned)
+                        @if (!borrow.IsReturned)
                         {
-                            <span class="badge bg-success">Yes</span>
+                            <form method="post" action=@Url.Action("ReturnBook","UserHome")>
+                                <input type="hidden" name="borrowId" value="@borrow.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">Return</button>
+                            </form>
                         }
                         else
                         {
-                            <span class="badge bg-warning">No</span>
+                            <span class="text-muted">Returned</span>
                         }
                     </td>
-
                 </tr>
             }
         </tbody>

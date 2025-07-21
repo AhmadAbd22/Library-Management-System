@@ -43,7 +43,7 @@ namespace Library_Management.Controllers
                 quantity = dto.totalQuantity,
                 ISBN = dto.ISBN,
                 isActive = (int)enumActiveStatus.Active,
-                createdAt = DateTime.Now
+                createdAt = DateTime.UtcNow
             };
 
             var result = await _bookRepo.AddBook(book);
@@ -69,26 +69,28 @@ namespace Library_Management.Controllers
             if (book == null)
                 return NotFound();
 
-            var dto = new BookDto
+            var dto = new EditBookDto
             {
+                Id = book.Id,
                 title = book.title,
                 author = book.author,
                 ISBN = book.ISBN,
-                totalQuantity = book.quantity
+                totalQuantity = book.quantity,
+                rentPrice = book.rentPrice
             };
 
-            ViewBag.BookId = id;
             return View(dto);
         }
 
+
         // POST: Edit Book
         [HttpPost]
-        public async Task<IActionResult> EditBook(Guid id, BookDto dto)
+        public async Task<IActionResult> EditBook(EditBookDto dto)
         {
             if (!ModelState.IsValid)
                 return View(dto);
 
-            var book = await _bookRepo.GetBookById(id);
+            var book = await _bookRepo.GetBookById(dto.Id);
             if (book == null)
                 return NotFound();
 
@@ -96,13 +98,27 @@ namespace Library_Management.Controllers
             book.author = dto.author;
             book.quantity = dto.totalQuantity;
             book.ISBN = dto.ISBN;
+            book.rentPrice = dto.rentPrice;
+            book.updatedAt = DateTime.UtcNow;
 
             var result = await _bookRepo.UpdateBook(book);
             if (result)
                 return RedirectToAction("BookList");
-            else
-                return View(dto);
+
+            return View(dto);
         }
+
+
+
+        // GET:
+        [HttpGet]
+        public async Task<IActionResult> ShowBooks()
+        {
+            var books = await _bookRepo.GetActiveBookList();
+            return View(books);
+        }
+
+
 
         // POST: Delete Book
         [HttpPost]
@@ -121,6 +137,12 @@ namespace Library_Management.Controllers
         [HttpGet]
         public async Task<IActionResult> FilterBooks(string search)
         {
+
+            if (string.IsNullOrEmpty(search))
+            {
+                TempData["Error"] = "Please enter a search term.";
+                return RedirectToAction("BookList");
+            }
             var filteredBooks = await _bookRepo.GetActiveBookListBySearch(search);
             return View("BookList", filteredBooks);
         }

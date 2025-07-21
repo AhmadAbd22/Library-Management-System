@@ -6,6 +6,18 @@
 }
 
 <h2>Add New Book</h2>
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="text-danger">
+        @foreach (var modelState in ViewData.ModelState)
+        {
+            foreach (var error in modelState.Value.Errors)
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        }
+    </ul>
+}
 <form action="@Url.Action("AddBook","Admin")" method="post" class="mt-4"> 
     @if (TempData["Success"] != null)
     {
@@ -23,25 +35,27 @@
 
     <div class="mb-3">
         <label for="ISBN" class="form-label"></label>
-        <input for="ISBN" class="form-control" placeholder="ISBN" />
+        <input for="ISBN" name="ISBN" class="form-control" placeholder="ISBN" />
     </div>
 
     <div class="mb-3">
         <label for="totalQuantity" class="form-label"></label>
-        <input for="totalQuantity" type="number" class="form-control"  placeholder="Quantity"/>
+        <input for="totalQuantity" name="totalQuantity" type="number" class="form-control"  placeholder="Quantity"/>
     </div>
 
     <div class="mb-3">
         <label for="rentPrice" class="form-label"></label>
-        <input for="rentPrice" type="number" class="form-control" placeholder="Rent Price" />
+        <input for="rentPrice" name="rentPrice" type="number" class="form-control" placeholder="Rent Price" />
     </div>
 
-    <button type="submit" class="btn btn-success">Add Book</button>
-    <a href="@Url.Action("AddBook", "Admin")" class="btn btn-secondary ms-4">Cancel</a>
+    <button type="submit" class="btn btn-success" action="@Url.Action("AddBook", "Admin")">Add Book</button>
+    <button type="reset" class="btn btn-secondary ms-4"> Cancel </button>
 
 </form>
 
+
+
 <div class="alert-light">
-    <a href="@Url.Action("AdminHome", "Admin")" class="btn btn-secondary mt-4">
+    <a href="@Url.Action("AdminHome", "Admin")" class="btn btn-secondary mt-4">Go to Home
     </a>
 </div>

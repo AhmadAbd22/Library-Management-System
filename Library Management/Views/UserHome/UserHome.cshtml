@@ -1,6 +1,7 @@
 ﻿@model List<Library_Management.Models.Book>
 @{
     ViewData["Title"] = "Available Books";
+    var borrowedBookIds = ViewBag.BorrowedBookIds as List<Guid>;
 }
 
 <h1 class="text-left mb-4">Home Page</h1>
@@ -8,6 +9,7 @@
 <h4>Available Books</h4>
 
 <form method="get" class="d-flex mb-4" role="search" action="@Url.Action("UserHome", "UserHome")">
+
     <input type="text" name="search" placeholder="Search books..." class="form-control rounded-pill w-50" />
     <button type="submit" class="btn btn-primary ms-3 rounded-pill">Search</button>
 </form>
@@ -43,12 +45,21 @@ else
                     <td>@book.author</td>
                     <td>@book.rentPrice Rs</td>
                     <td>
-                        <form method="post" action="@Url.Action("BorrowBook", "UserHome")">
-                            <input type="hidden" name="bookId" value="@book.Id" />
-                            <button type="submit" class="btn btn-success btn-sm rounded-pill">
-                                Borrow
+                        @if (borrowedBookIds != null && borrowedBookIds.Contains(book.Id))
+                        {
+                            <button class="btn btn-secondary btn-sm rounded-pill" disabled>
+                                Borrowed
                             </button>
-                        </form>
+                        }
+                        else
+                        {
+                            <form method="post" action="@Url.Action("BorrowBook", "UserHome")">
+                                <input type="hidden" name="bookId" value="@book.Id" />
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill">
+                                    Borrow
+                                </button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }

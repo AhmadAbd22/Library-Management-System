@@ -16,7 +16,6 @@ namespace Library_Management.Controllers
         }
 
         //Sign Up//
-
         public IActionResult SignUp()
         {
             return View();
@@ -26,6 +25,7 @@ namespace Library_Management.Controllers
         {
             if (!ModelState.IsValid)
                 return View(signup);
+
             var existingUser = await _userRepo.GetUserByEmail(signup.Email);  // check if user exists
             if (existingUser != null)
             {
@@ -41,7 +41,7 @@ namespace Library_Management.Controllers
                 address = signup.Address,
                 city = signup.City,
                 phoneNumber = signup.Phone,
-                password = StringCipher.EncryptString(signup.Password),
+                password = signup.Password,
                 isActive = (int)enumActiveStatus.Active,
                 role = (int)enumRole.Customer,
                 createdAt = DateTime.UtcNow

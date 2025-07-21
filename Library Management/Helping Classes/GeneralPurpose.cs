@@ -35,15 +35,6 @@ namespace Library_Management.HelpingClasses
                     Email = email,
                     Role = Convert.ToInt32(role),
                 };
-                //var baseUri = GetFilePath(loggedInUser.Id.ToString());
-                //if (string.IsNullOrEmpty(profile))
-                //{
-                //    loggedInUser.Profile = "";
-                //}
-                //else
-                //{
-                //    loggedInUser.Profile = baseUri + loggedInUser.Profile;
-                //}
             }
 
             return loggedInUser;

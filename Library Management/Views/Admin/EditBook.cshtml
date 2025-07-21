@@ -1,38 +1,39 @@
-﻿@model List<Library_Management.Models.Dtos.BookDto>
+﻿@model Library_Management.Models.Dtos.EditBookDto
 
 @{
-    ViewData["Title"] = "Book List";
+    ViewData["Title"] = "Edit Book";
 }
 
-<h2>Book List</h2>
+<h2>Edit Book</h2>
 
-<table class="table table-bordered mt-4">
-    <thead class="table-light">
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>ISBN</th>
-            <th>Total Quantity</th>
-            <th>Rent Price</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model)
-        {
-            <tr>
-                <td>@book.title</td>
-                <td>@book.author</td>
-                <td>@book.ISBN</td>
-                <td>@book.totalQuantity</td>
-                <td>@book.rentPrice</td>
-                <td>
-                    <a href="@Url.Action("EditBook", "Admin", new { id = book.Id })" class="btn btn-sm btn-primary me-2">Edit</a>
-                    <form method="post" action="@Url.Action("DeleteBook", "Admin", new { id = book.Id })" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<form action="@Url.Action("EditBook", "Admin")" method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="form-group mb-3">
+        <label for="title">Title</label>
+        <input name="title" class="form-control" placeholder="Title" value="@Model.title" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="author">Author</label>
+        <input name="author" type="text" class="form-control" placeholder="Author" value="@Model.author" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="ISBN">ISBN</label>
+        <input name="ISBN" type="text" class="form-control" placeholder="ISBN" value="@Model.ISBN" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="totalQuantity">Quantity</label>
+        <input name="totalQuantity" type="number" class="form-control" placeholder="Quantity" value="@Model.totalQuantity" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="rentPrice">Rent Price</label>
+        <input name="rentPrice" type="number" class="form-control" placeholder="Rent Price" value="@Model.rentPrice" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Update</button>
+    <a href="@Url.Action("BookList", "Admin")" class="btn btn-secondary ms-2">Cancel</a>
+</form>

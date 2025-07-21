@@ -31,7 +31,7 @@ namespace Library_Management.Controllers
                 return View(books);
             }
 
-            // GET: Search active booksS
+            // GET: Search active books
             [HttpGet]
             public async Task<IActionResult> Search(string search)
             {
@@ -44,6 +44,15 @@ namespace Library_Management.Controllers
             public async Task<IActionResult> Borrow(Guid bookId)
             {
                 var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var borrowedBooks = await _borrowRepo.GetUserBorrows(userId);
+                var alreadyBorrowed = borrowedBooks.Any(b => b.bookId == bookId && !b.IsReturned);
+
+                if (alreadyBorrowed)
+                {
+                    TempData["Error"] = "You have already borrowed this book and not returned it.";
+                    return RedirectToAction("Index");
+                }
+
                 var success = await _borrowRepo.BorrowedBooks(userId, bookId);
 
                 if (success)
@@ -55,7 +64,7 @@ namespace Library_Management.Controllers
                     TempData["Error"] = "Failed to borrow the book. Please try again.";
                 }
 
-                return RedirectToAction("Index");
+                return RedirectToAction("UserHome", "UserHome");
             }
 
             // GET: My Borrowed Books
@@ -65,6 +74,8 @@ namespace Library_Management.Controllers
                 var borrows = await _borrowRepo.GetUserBorrows(userId);
                 return View(borrows);
             }
+
+
         }
     }
 

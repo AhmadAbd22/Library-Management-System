@@ -39,8 +39,9 @@ namespace Library_Management.Models.Repositories
         Task<bool> BorrowedBooks(Guid userId, Guid bookId);
         Task<bool> ReturnBook(Guid borrowId);
         Task<IEnumerable<BorrowedBooks>> GetUserBorrows(Guid userId);
-        Task<IEnumerable<BorrowedBooks>> GetAllBorrows(); // for admin
-        Task<int> GetTotalBorrowedCount(); // for dashboard
+        Task<IEnumerable<BorrowedBooks>> GetAllBorrows();
+        Task<int> GetTotalBorrowedCount();
+
     }
 
     public class BorrowRepo : IBorrowRepo
@@ -71,7 +72,7 @@ namespace Library_Management.Models.Repositories
                     createdAt = DateTime.UtcNow
                 };
 
-                book.quantity--; // Reduce quantity when borrowed
+                book.quantity--; 
 
                 _context.BorrowedBooks.Add(borrow);
                 _context.Books.Update(book);
@@ -100,7 +101,7 @@ namespace Library_Management.Models.Repositories
                 var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == borrow.bookId);
                 if (book != null)
                 {
-                    book.quantity++; // Increment quantity on return
+                    book.quantity++;
                     _context.Books.Update(book);
                 }
 
@@ -157,9 +158,10 @@ public class UserRepo : IUserRepo
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+            Console.WriteLine($"Error adding user: {ex.Message}");
+            throw; 
             }
         }
 
@@ -228,7 +230,6 @@ public class UserRepo : IUserRepo
             if (existingUser == null)
                 return false;
 
-            // Update fields
             existingUser.firstName = user.firstName;
             existingUser.lastName = user.lastName;
             existingUser.email = user.email;
@@ -359,9 +360,33 @@ public class BookRepo : IBookRepo
             }
         }
 
-        public Task<bool> UpdateBook(Book book)
+    public async Task<bool> UpdateBook(Book book)
+    {
+        if (book == null || book.Id == Guid.Empty)
+            return false;
+
+        var existingBook = await _context.Books.FirstOrDefaultAsync(b => b.Id == book.Id && b.isActive == (int)enumActiveStatus.Active);
+        if (existingBook == null)
+            return false;
+
+        existingBook.title = book.title;
+        existingBook.author = book.author;
+        existingBook.ISBN = book.ISBN;
+        existingBook.quantity = book.quantity;
+        existingBook.rentPrice = book.rentPrice;
+        existingBook.updatedAt = DateTime.UtcNow;
+
+        try
         {
-            throw new NotImplementedException();
+            _context.Books.Update(existingBook);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
+
+}
 
