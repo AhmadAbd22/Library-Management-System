@@ -42,7 +42,7 @@ namespace Library_Management.Controllers
                 address = signup.Address,
                 city = signup.City,
                 phoneNumber = signup.Phone,
-                password = PasswordHelper.HashPassword(signup.Password),,
+                password = PasswordHelper.HashPassword(signup.Password),
                 isActive = (int)enumActiveStatus.Active,
                 role = (int)enumRole.Customer,
                 createdAt = DateTime.UtcNow

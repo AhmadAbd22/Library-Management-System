@@ -1,4 +1,5 @@
 ﻿using Library_Management.Controllers;
+using Library_Management.Helping_Classes;
 using Library_Management.HelpingClasses;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ namespace Library_Management.Models.Context
                     lastName = "Bhai",
                     phoneNumber = "12341234567",
                     email = "admin1@gmail.com",
-                    password = "123",
+                    password = PasswordHelper.HashPassword("123"),
                     role = (int)enumRole.Admin,
                     isActive = (int)enumActiveStatus.Active,
                     createdAt = new DateTime(2024, 01, 01),

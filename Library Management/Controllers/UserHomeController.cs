@@ -24,6 +24,7 @@ namespace Library_Management.Controllers
             _bookRepo = bookRepo;
             _context = context;
         }
+
         public async Task<IActionResult> UserHome(string search)
         {
             List<Book> books;
@@ -37,28 +38,51 @@ namespace Library_Management.Controllers
                 books = (await _bookRepo.GetActiveBookList()).ToList();
             }
 
-            return View(books); 
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (Guid.TryParse(userIdClaim, out Guid userId))
+            {
+                var borrows = await _borrowRepo.GetUserBorrows(userId);
+                var borrowedIds = borrows.Where(b => !b.IsReturned).Select(b => b.bookId).ToList();
+                ViewBag.BorrowedBookIds = borrowedIds;
+            }
+
+            return View(books);
         }
 
         [HttpPost]
-        public async Task<IActionResult> BorrowBook(Guid bookId)
+        public async Task<IActionResult> BorrowBook(Guid bookId, DateTime returnDate)
         {
+            if (returnDate > DateTime.Now.AddDays(20))
+            {
+                TempData["Error"] = "Return date must be within 20 days.";
+                return RedirectToAction("UserHome"); 
+            }
+
+            if (returnDate <= DateTime.Now)
+            {
+                TempData["Error"] = "Return date must be in the future.";
+                return RedirectToAction("UserHome");
+            }
+
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdClaim, out Guid userId))
             {
-                TempData["Error"] = "User is not logged in.";
-                return RedirectToAction("Login", "Login");
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("UserHome");
             }
-            var alreadyBorrowed = _borrowRepo.GetUserBorrows(userId);
+
+            var success = await _borrowRepo.BorrowedBooks(userId, bookId, returnDate);
+
+            if (success)
             {
-                if (userId == null)
-                {
-                    var borrows = await _borrowRepo.GetUserBorrows(userId);
-                    return View(borrows);
-                }
+                TempData["Success"] = "Book borrowed successfully!"; 
             }
-            TempData["BorrowedBefore"] = "Book is already borrowed by the user";
-            return RedirectToAction("UserHome", "UserHome");
+            else
+            {
+                TempData["Error"] = "Could not borrow book. It might be out of stock or already borrowed.";
+            }
+
+            return RedirectToAction("UserHome");
         }
 
         [HttpGet]
@@ -77,28 +101,31 @@ namespace Library_Management.Controllers
         [HttpPost]
         public async Task<IActionResult> ReturnBook(Guid borrowId)
         {
-            var borrow = await _context.BorrowedBooks.FindAsync(borrowId);
+            var result = await _borrowRepo.ReturnBook(borrowId);
 
-            if (borrow == null)
+            if (!result)
             {
-                TempData["Error"] = "Borrow record not found.";
-                return RedirectToAction("BorrowedBooks");
+                TempData["Error"] = "Failed to return the book.";
+            }
+            else
+            {
+                TempData["Success"] = "Book returned successfully!";
             }
 
-            if (borrow.IsReturned)
+            return RedirectToAction("BorrowHistory", "UserHome");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BorrowHistory()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdClaim, out Guid userId))
             {
-                TempData["Error"] = "This book has already been returned.";
-                return RedirectToAction("BorrowedBooks");
+                return RedirectToAction("UserHome", "UserHome");
             }
 
-            borrow.IsReturned = true;
-            borrow.returnDate = DateTime.UtcNow;
-
-            _context.BorrowedBooks.Update(borrow);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Book returned successfully!";
-            return View(borrow);
+            var history = await _borrowRepo.GetUserBorrowHistory(userId);
+            return View(history); 
         }
 
         public async Task<IActionResult> Logout()

@@ -22,8 +22,6 @@ namespace Library_Management.Models.Repositories
         Task<User?> GetUserByEmail(string email);
     }
 
-
-
     public interface IBookRepo
     {
         Task<IEnumerable<Book>> GetActiveBookList();
@@ -31,118 +29,23 @@ namespace Library_Management.Models.Repositories
         Task<bool> AddBook(Book book);
         Task<Book?> GetBookById(Guid id);
         Task<bool> UpdateBook(Book book);
-        Task<bool> DeleteBook (Guid id);
+        Task<bool> DeleteBook(Guid id);
+        Task<bool> IsBookBorrowed(Guid id); // Changed to async Task<bool>
     }
 
     public interface IBorrowRepo
     {
-        Task<bool> BorrowedBooks(Guid userId, Guid bookId);
+        Task<bool> BorrowedBooks(Guid userId, Guid bookId, DateTime returnDate);
         Task<bool> ReturnBook(Guid borrowId);
         Task<IEnumerable<BorrowedBooks>> GetUserBorrows(Guid userId);
         Task<IEnumerable<BorrowedBooks>> GetAllBorrows();
         Task<int> GetTotalBorrowedCount();
+        Task<IEnumerable<BorrowedBooks>> GetUserBorrowHistory(Guid userId);
+        Task<bool> IsBookBorrowed(Guid id);
     }
 
-    public class BorrowRepo : IBorrowRepo
-    {
-        private readonly LibraryManagementDbContext _context;
-
-        public BorrowRepo(LibraryManagementDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<bool> BorrowedBooks(Guid userId, Guid bookId)
-        {
-            try
-            {
-                var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == bookId && x.isActive == (int)enumActiveStatus.Active);
-                if (book == null || book.quantity <= 0)
-                    return false;
-
-                var borrow = new BorrowedBooks
-                {
-                    Id = Guid.NewGuid(),
-                    bookId = bookId,
-                    userId = userId,
-                    rentDate = DateTime.UtcNow,
-                    rentPrice = 0, 
-                    isActive = (int)enumActiveStatus.Active,
-                    createdAt = DateTime.UtcNow
-                };
-
-                book.quantity--; 
-
-                _context.BorrowedBooks.Add(borrow);
-                _context.Books.Update(book);
-                await _context.SaveChangesAsync();
-                await _context.SaveChangesAsync();
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> ReturnBook(Guid borrowId)
-        {
-            try
-            {
-                var borrow = await _context.BorrowedBooks.FirstOrDefaultAsync(x => x.Id == borrowId);
-                if (borrow == null)
-                    return false;
-
-                borrow.returnDate = DateTime.UtcNow;
-                borrow.isActive = (int)enumActiveStatus.Pending;
-
-                var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == borrow.bookId);
-                if (book != null)
-                {
-                    book.quantity++;
-                    _context.Books.Update(book);
-                }
-
-                _context.BorrowedBooks.Update(borrow);
-                await _context.SaveChangesAsync();
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<IEnumerable<BorrowedBooks>> GetUserBorrows(Guid userId)
-        {
-            return await _context.BorrowedBooks
-                .Include(x => x.book)
-                .Where(x => x.userId == userId && x.isActive == (int)enumActiveStatus.Active)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<BorrowedBooks>> GetAllBorrows()
-        {
-            return await _context.BorrowedBooks
-                .Include(x => x.book)
-                .Where(x => x.isActive == (int)enumActiveStatus.Active)
-                .ToListAsync();
-        }
-
-        public async Task<int> GetTotalBorrowedCount()
-        {
-            return await _context.BorrowedBooks
-                .Where(x => x.isActive == (int)enumActiveStatus.Active)
-                .CountAsync();
-        }
-    }
-}
-
-//USER
-
-public class UserRepo : IUserRepo
+    //USER
+    public class UserRepo : IUserRepo
     {
         private readonly LibraryManagementDbContext _context;
         public UserRepo(LibraryManagementDbContext context)
@@ -159,8 +62,8 @@ public class UserRepo : IUserRepo
             }
             catch (Exception ex)
             {
-            Console.WriteLine($"Error adding user: {ex.Message}");
-            throw; 
+                Console.WriteLine($"Error adding user: {ex.Message}");
+                throw;
             }
         }
 
@@ -184,15 +87,6 @@ public class UserRepo : IUserRepo
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Book>> GetActiveBooks()
-        {
-            return await _context.Books
-                .Where(b => b.isActive == (int)enumActiveStatus.Active)
-                .OrderByDescending(b => b.createdAt)
-                .ToListAsync();
-        }
-
-
         public Task<(int ActiveUserCount, int NonActiveUserCount)> GetActive_NonActiveUserCount()
         {
             throw new NotImplementedException();
@@ -200,22 +94,22 @@ public class UserRepo : IUserRepo
 
         public async Task<User?> GetUserByEmail(string email)
         {
-        return await _context.Users.FirstOrDefaultAsync(
-            x => x.email!.ToLower() == email.Trim().ToLower()
-              && x.isActive == (int)enumActiveStatus.Active);
-    }
-
-    public async Task<User?> GetUserById(Guid id)
-        {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Id == id && x.isActive == (int)enumActiveStatus.Active);
+            return await _context.Users.FirstOrDefaultAsync(
+                x => x.email!.ToLower() == email.Trim().ToLower()
+                  && x.isActive == (int)enumActiveStatus.Active);
         }
 
-    public async Task<User?> GetUserByLogin(string email)
-    {
-        return await _context.Users.FirstOrDefaultAsync(u => u.email == email && u.isActive == (int)enumActiveStatus.Active);
-    }
+        public async Task<User?> GetUserById(Guid id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id == id && x.isActive == (int)enumActiveStatus.Active);
+        }
 
-    public Task<bool> IsUserValidate(Guid id)
+        public async Task<User?> GetUserByLogin(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.email == email && u.isActive == (int)enumActiveStatus.Active);
+        }
+
+        public Task<bool> IsUserValidate(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -257,44 +151,182 @@ public class UserRepo : IUserRepo
         }
     }
 
-
-//BOOK
-
-public class BookRepo : IBookRepo
+    //BORROW
+    public class BorrowRepo : IBorrowRepo
     {
-    private readonly LibraryManagementDbContext _context;
+        private readonly LibraryManagementDbContext _context;
 
-    public BookRepo(LibraryManagementDbContext context)
-    {
-        _context = context;
+        public BorrowRepo(LibraryManagementDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<bool> BorrowedBooks(Guid userId, Guid bookId, DateTime returnDate)
+        {
+            // Use a transaction to ensure data consistency
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var book = await _context.Books.FindAsync(bookId);
+                if (book == null || book.quantity <= 0)
+                    return false;
+
+                bool alreadyBorrowed = await _context.BorrowedBooks
+                    .AnyAsync(x => x.userId == userId && x.bookId == bookId && x.IsReturned == false);
+
+                if (alreadyBorrowed)
+                    return false;
+
+                var borrow = new BorrowedBooks
+                {
+                    Id = Guid.NewGuid(),
+                    userId = userId,
+                    bookId = bookId,
+                    rentDate = DateTime.Now,
+                    returnDate = returnDate,
+                    IsReturned = false,
+                    isActive = (int)enumActiveStatus.Active,
+                    createdAt = DateTime.UtcNow
+                };
+
+                book.quantity--;
+                book.updatedAt = DateTime.UtcNow;
+
+                _context.BorrowedBooks.Add(borrow);
+                _context.Books.Update(book); // Explicitly update the book
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine($"Error in BorrowedBooks: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> ReturnBook(Guid borrowId)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var borrowRecord = await _context.BorrowedBooks.FindAsync(borrowId);
+                if (borrowRecord == null || borrowRecord.IsReturned)
+                    return false;
+
+                borrowRecord.IsReturned = true;
+                borrowRecord.returnDate = DateTime.Now;
+                borrowRecord.updatedAt = DateTime.UtcNow;
+
+                var book = await _context.Books.FindAsync(borrowRecord.bookId);
+                if (book != null)
+                {
+                    book.quantity += 1;
+                    book.updatedAt = DateTime.UtcNow;
+                    _context.Books.Update(book);
+                }
+
+                _context.BorrowedBooks.Update(borrowRecord);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine($"Error in ReturnBook: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<BorrowedBooks>> GetUserBorrows(Guid userId)
+        {
+            return await _context.BorrowedBooks
+                .Include(x => x.book)
+                .Where(x => x.userId == userId && x.isActive == (int)enumActiveStatus.Active && !x.IsReturned)
+                .OrderByDescending(x => x.createdAt)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<BorrowedBooks>> GetAllBorrows()
+        {
+            return await _context.BorrowedBooks
+                .Include(x => x.book)
+                .Where(x => x.isActive == (int)enumActiveStatus.Active)
+                .OrderByDescending(x => x.createdAt)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalBorrowedCount()
+        {
+            return await _context.BorrowedBooks
+                .Where(x => x.isActive == (int)enumActiveStatus.Active && !x.IsReturned)
+                .CountAsync();
+        }
+
+        public async Task<IEnumerable<BorrowedBooks>> GetUserBorrowHistory(Guid userId)
+        {
+            return await _context.BorrowedBooks
+                .Include(x => x.book)
+                .Where(x => x.userId == userId)
+                .OrderByDescending(x => x.createdAt)
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsBookBorrowed(Guid id)
+        {
+            return await _context.BorrowedBooks
+                .AnyAsync(bb => bb.bookId == id && bb.isActive == (int)enumActiveStatus.Active && !bb.IsReturned);
+        }
     }
-    public async Task<bool> AddBook(Book book)
+
+    //BOOK
+    public class BookRepo : IBookRepo
+    {
+        private readonly LibraryManagementDbContext _context;
+
+        public BookRepo(LibraryManagementDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<bool> AddBook(Book book)
         {
             try
             {
                 if (book == null)
-                    return await Task.FromResult(false);
+                    return false;
+
                 book.Id = Guid.NewGuid();
                 book.isActive = (int)enumActiveStatus.Active;
                 book.createdAt = DateTime.UtcNow;
+
                 _context.Books.Add(book);
-                _context.SaveChanges();
-                return await Task.FromResult(true);
+                await _context.SaveChangesAsync();
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
-                return await Task.FromResult(false);
+                Console.WriteLine($"Error adding book: {ex.Message}");
+                return false;
             }
         }
 
-        public async Task<bool> DeleteBook(string title)
+        public async Task<bool> DeleteBook(Guid id)
         {
             try
             {
-                var book = await _context.Books
-                    .FirstOrDefaultAsync(b => b.title.ToLower().Trim() == title.ToLower().Trim()
-                                           && b.isActive == (int)enumActiveStatus.Active);
+                // Check if book is currently borrowed
+                if (await IsBookBorrowed(id))
+                    return false;
 
+                var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
                 if (book == null)
                     return false;
 
@@ -305,95 +337,86 @@ public class BookRepo : IBookRepo
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error deleting book: {ex.Message}");
                 return false;
             }
         }
 
-        public Task<bool> DeleteBook(Guid id)
+        public async Task<IEnumerable<Book>> GetActiveBookList()
         {
-            try
-            {
-                var book = _context.Books.FirstOrDefault(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
-                if (book == null)
-                    return Task.FromResult(false);
-                book.isActive = (int)enumActiveStatus.Deleted;
-                book.updatedAt = DateTime.UtcNow;
-                _context.Books.Update(book);
-                _context.SaveChanges();
-                return Task.FromResult(true);
-            }
-            catch
-            {
-                return Task.FromResult(false);
-            }
+            return await _context.Books
+                .Where(b => b.isActive == (int)enumActiveStatus.Active)
+                .OrderByDescending(b => b.createdAt)
+                .ToListAsync();
         }
 
-    public async Task<IEnumerable<Book>> GetActiveBookList()
-    {
-        return await _context.Books.Where(b => b.isActive == (int)enumActiveStatus.Active).ToListAsync();
-    }
-
-    public async Task<IEnumerable<Book>> GetActiveBookListBySearch(string searchValue)
-    {
-        searchValue = searchValue.Trim().ToLower();
-        var result = await _context.Books.Where(b => b.isActive == (int)enumActiveStatus.Active && b.title.ToLower().Contains(searchValue)).ToListAsync();
-        return result;
-    }
-
-        public Task<string?> GetActiveBooks()
+        public async Task<IEnumerable<Book>> GetActiveBookListBySearch(string searchValue)
         {
-        return (Task<string?>)_context.Books.Where(b => b.isActive == (int)enumActiveStatus.Active);
+            if (string.IsNullOrWhiteSpace(searchValue))
+                return await GetActiveBookList();
+
+            searchValue = searchValue.Trim().ToLower();
+            return await _context.Books
+                .Where(b => b.isActive == (int)enumActiveStatus.Active &&
+                           (b.title.ToLower().Contains(searchValue) ||
+                            b.author.ToLower().Contains(searchValue)))
+                .OrderByDescending(b => b.createdAt)
+                .ToListAsync();
         }
 
         public async Task<Book?> GetBookById(Guid id)
         {
             try
             {
-                return await _context.Books.FirstOrDefaultAsync(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
+                return await _context.Books
+                    .FirstOrDefaultAsync(b => b.Id == id && b.isActive == (int)enumActiveStatus.Active);
             }
-            catch
+            catch (Exception ex)
             {
-                return await Task.FromResult<Book?>(null);
+                Console.WriteLine($"Error getting book by id: {ex.Message}");
+                return null;
             }
         }
 
-    public async Task<bool> UpdateBook(Book book)
-    {
-        if (book == null || book.Id == Guid.Empty)
-            return false;
-
-        var existingBook = await _context.Books.FirstOrDefaultAsync(b => b.Id == book.Id && b.isActive == (int)enumActiveStatus.Active);
-        if (existingBook == null)
-            return false;
-
-        existingBook.title = book.title;
-        existingBook.author = book.author;
-        existingBook.ISBN = book.ISBN;
-        existingBook.quantity = book.quantity;
-        existingBook.rentPrice = book.rentPrice;
-        existingBook.updatedAt = DateTime.UtcNow;
-
-        try
+        public async Task<bool> UpdateBook(Book book)
         {
-            _context.Books.Update(existingBook);
-            await _context.SaveChangesAsync();
-            return true;
+            if (book == null || book.Id == Guid.Empty)
+                return false;
+
+            try
+            {
+                var existingBook = await _context.Books
+                    .FirstOrDefaultAsync(b => b.Id == book.Id && b.isActive == (int)enumActiveStatus.Active);
+
+                if (existingBook == null)
+                    return false;
+
+                existingBook.title = book.title;
+                existingBook.author = book.author;
+                existingBook.ISBN = book.ISBN;
+                existingBook.quantity = book.quantity;
+                existingBook.rentPrice = book.rentPrice;
+                existingBook.updatedAt = DateTime.UtcNow;
+
+                _context.Books.Update(existingBook);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating book: {ex.Message}");
+                return false;
+            }
         }
-        catch
+
+        public async Task<bool> IsBookBorrowed(Guid id)
         {
-            return false;
+            return await _context.BorrowedBooks
+                .AnyAsync(bb => bb.bookId == id &&
+                               bb.isActive == (int)enumActiveStatus.Active &&
+                               !bb.IsReturned);
         }
     }
-
-    public List<Book> GetBooksBySearch(string search)
-    {
-        search = search.ToLower().Trim();
-        return _context.Books
-            .Where(b => b.title.ToLower().Contains(search) || b.author.ToLower().Contains(search))
-            .ToList();
-    }
-
 }
-

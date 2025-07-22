@@ -41,19 +41,26 @@ namespace Library_Management.Controllers
 
             // POST: Borrow a book
             [HttpPost]
-            public async Task<IActionResult> Borrow(Guid bookId)
+            public async Task<IActionResult> Borrow(Guid bookId, DateTime returnDate)
             {
                 var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
                 var borrowedBooks = await _borrowRepo.GetUserBorrows(userId);
                 var alreadyBorrowed = borrowedBooks.Any(b => b.bookId == bookId && !b.IsReturned);
 
                 if (alreadyBorrowed)
                 {
                     TempData["Error"] = "You have already borrowed this book and not returned it.";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("ShowBooks");
                 }
 
-                var success = await _borrowRepo.BorrowedBooks(userId, bookId);
+                if (returnDate < DateTime.Today || returnDate > DateTime.Today.AddDays(20))
+                {
+                    TempData["Error"] = "Return date must be within 20 days from today.";
+                    return RedirectToAction("ShowBooks");
+                }
+
+                var success = await _borrowRepo.BorrowedBooks(userId, bookId, returnDate);
 
                 if (success)
                 {
@@ -66,6 +73,7 @@ namespace Library_Management.Controllers
 
                 return RedirectToAction("UserHome", "UserHome");
             }
+
 
             // GET: My Borrowed Books
             public async Task<IActionResult> MyBorrows()

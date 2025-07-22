@@ -5,64 +5,69 @@
 
 <style>
     body {
-        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    background: linear-gradient(to right, #d9e4f5, #f2f6ff);
     }
 
     .dashboard-card {
-        background-color: #ffffff;
-        border-radius: 22px;
-        padding: 40px;
-        height: 250px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        font-weight: 600;
-        text-align: center;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #ffffff;
+    border-radius: 22px;
+    padding: 40px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
+    .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
 
-        .dashboard-card a {
-            color: #4a90e2;
-            text-decoration: none;
-        }
+    .dashboard-card a {
+    color: #4a90e2;
+    text-decoration: none;
+    }
 
     .form-control {
-        border-radius: 22px !important;
-        padding: 10px 20px;
+    border-radius: 22px !important;
+    padding: 10px 20px;
     }
 
     .btn {
-        border-radius: 22px !important;
-        padding: 10px 20px;
+    border-radius: 22px !important;
+    padding: 10px 20px;
     }
 
     .header-section {
-        background: linear-gradient(to right, #4a90e2, #6fb1fc);
-        color: white;
-        padding: 60px 0;
-        border-bottom-left-radius: 60px;
-        border-bottom-right-radius: 60px;
+    background: linear-gradient(to right, #4a90e2, #6fb1fc);
+    color: white;
+    padding: 60px 0;
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
     }
 
-        .header-section h2 {
-            font-weight: 700;
-        }
+    .header-section h2 {
+    font-weight: 700;
+    }
 
     .book-card {
-        background-color: #f9f9f9;
-        border-radius: 16px;
-        padding: 20px;
-        border-left: 5px solid #4a90e2;
-        margin-bottom: 15px;
+    background-color: #f9f9f9;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 5px solid #4a90e2;
+    margin-bottom: 15px;
     }
 </style>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-info shadow-sm">@TempData["Error"]</div>
+}
 
 <div class="container mt-4">
     <form method="post" action="@Url.Action("Logout", "Login")">
@@ -82,7 +87,7 @@
 </div>
 
 <div class="container my-5">
-    <!-- Cards Row -->
+
     <div class="row g-4 mb-4">
         <div class="col-md-6">
             <div class="dashboard-card">
@@ -105,7 +110,6 @@
         </div>
     </div>
 
-    <!-- Search Results -->
     <div class="mt-4">
         @if (searchResults != null && searchResults.Any())
         {

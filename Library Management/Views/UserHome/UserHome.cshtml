@@ -42,6 +42,34 @@
     .alert {
         border-radius: 22px;
     }
+
+    .price-display {
+        font-weight: 500;
+        color: #28a745;
+    }
+
+    .quantity-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+
+    .quantity-available {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .quantity-low {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .quantity-out {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
 </style>
 
 <div class="page-header">
@@ -52,21 +80,46 @@
 <div class="container mb-5">
 
     <form method="get" class="d-flex mb-4 search-form" role="search" action="@Url.Action("UserHome", "UserHome")">
-        <input type="text" name="search" placeholder="Search books..." class="form-control rounded-pill shadow-sm" />
+        <input type="text" name="search" value="@Context.Request.Query["search"]" placeholder="Search books..." class="form-control rounded-pill shadow-sm" />
         <button type="submit" class="btn btn-primary ms-3 btn-rounded shadow-sm">Search</button>
+        @if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
+        {
+            <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-outline-secondary ms-2 btn-rounded shadow-sm">Clear</a>
+        }
     </form>
+
+    @if (TempData["BorrowedBefore"] != null)
+    {
+        <div class="alert alert-info shadow-sm">@TempData["BorrowedBefore"]</div>
+    }
 
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success shadow-sm">@TempData["Success"]</div>
     }
+
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
     }
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success shadow-sm">@TempData["Message"]</div>
+    }
+
     @if (Model == null || !Model.Any())
     {
-        <div class="alert alert-warning text-center shadow-sm">No books found matching your search.</div>
+        <div class="alert alert-warning text-center shadow-sm">
+            @if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
+            {
+                <span>No books found matching your search "<strong>@Context.Request.Query["search"]</strong>".</span>
+            }
+            else
+            {
+                <span>No books are currently available in the library.</span>
+            }
+        </div>
     }
     else
     {
@@ -76,7 +129,8 @@
                     <tr>
                         <th>Title</th>
                         <th>Author</th>
-                        <th>Price</th>
+                        <th>Rent Price</th>
+                        <th>Available Quantity</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -84,23 +138,55 @@
                     @foreach (var book in Model)
                     {
                         <tr>
-                            <td>@book.title</td>
+                            <td>
+                                <strong>@book.title</strong>
+                                @if (!string.IsNullOrEmpty(book.ISBN))
+                                {
+                                    <br>
+                                    <small class="text-muted">ISBN: @book.ISBN</small>
+                                }
+                            </td>
                             <td>@book.author</td>
-                            <td>@book.rentPrice Rs</td>
+                            <td>
+                                <span class="price-display">
+                                    Rs. @book.rentPrice.ToString("0.00")
+                                    @* Debug: Raw value = @book.rentPrice *@
+                                </span>
+                            </td>
+                            <td>
+                                <span class="quantity-badge @(book.quantity <= 0 ? "quantity-out" : book.quantity <= 2 ? "quantity-low" : "quantity-available")">
+                                    @book.quantity @(book.quantity == 1 ? "copy" : "copies")
+                                </span>
+                            </td>
                             <td>
                                 @if (borrowedBookIds != null && borrowedBookIds.Contains(book.Id))
                                 {
+                                    <button class="btn btn-warning btn-sm btn-rounded" disabled>
+                                        <i class="fas fa-check"></i> Already Borrowed
+                                    </button>
+                                }
+                                else if (book.quantity <= 0)
+                                {
                                     <button class="btn btn-secondary btn-sm btn-rounded" disabled>
-                                        Borrowed
+                                        <i class="fas fa-times"></i> Out of Stock
                                     </button>
                                 }
                                 else
                                 {
                                     <form method="post" action="@Url.Action("BorrowBook", "UserHome")" class="d-inline">
-                                        <input type="hidden" name="bookId" value="@book.Id" />
-                                        <button type="submit" class="btn btn-success btn-sm btn-rounded">
-                                            Borrow
-                                        </button>
+                                        <div class="input-group input-group-sm">
+                                            <input type="hidden" name="bookId" value="@book.Id" />
+                                            <input type="date" name="returnDate"
+                                                   class="form-control"
+                                                   style="max-width: 140px;"
+                                                   min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                                                   max="@DateTime.Today.AddDays(20).ToString("yyyy-MM-dd")"
+                                                   value="@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")"
+                                                   required />
+                                            <button type="submit" class="btn btn-success btn-sm btn-rounded ms-2">
+                                                <i class="fas fa-book"></i> Borrow
+                                            </button>
+                                        </div>
                                     </form>
                                 }
                             </td>
@@ -109,11 +195,23 @@
                 </tbody>
             </table>
         </div>
+
+        @if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
+        {
+            <div class="mt-3">
+                <small class="text-muted">
+                    Found @Model.Count() book(s) matching "@Context.Request.Query["search"]"
+                </small>
+            </div>
+        }
     }
 
     <div class="mt-4 text-center">
-        <a href="@Url.Action("BorrowedBooks", "UserHome")" class="btn btn-outline-primary btn-rounded">
-            View Borrowed Books
+        <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-outline-primary btn-rounded me-2">
+            <i class="fas fa-list"></i> View My Borrowed Books
+        </a>
+        <a href="@Url.Action("BorrowHistory", "UserHome")" class="btn btn-outline-info btn-rounded">
+            <i class="fas fa-history"></i> View Borrow History
         </a>
     </div>
 

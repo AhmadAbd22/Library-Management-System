@@ -6,39 +6,39 @@
 
 <style>
     body {
-        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    background: linear-gradient(to right, #d9e4f5, #f2f6ff);
     }
 
     .page-header {
-        background: linear-gradient(to right, #4a90e2, #6fb1fc);
-        color: white;
-        padding: 50px 0;
-        border-bottom-left-radius: 60px;
-        border-bottom-right-radius: 60px;
-        text-align: center;
-        margin-bottom: 40px;
+    background: linear-gradient(to right, #4a90e2, #6fb1fc);
+    color: white;
+    padding: 50px 0;
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
+    text-align: center;
+    margin-bottom: 40px;
     }
 
     .custom-table {
-        border-radius: 22px;
-        overflow: hidden;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     }
 
-        .custom-table thead {
-            background-color: #4a90e2;
-            color: white;
-        }
+    .custom-table thead {
+    background-color: #4a90e2;
+    color: white;
+    }
 
     .badge {
-        font-size: 0.9rem;
-        border-radius: 20px;
-        padding: 6px 14px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    padding: 6px 14px;
     }
 
     .btn-rounded {
-        border-radius: 20px;
-        padding: 6px 14px;
+    border-radius: 20px;
+    padding: 6px 14px;
     }
 </style>
 
@@ -58,6 +58,7 @@
                         <th>Book Title</th>
                         <th>Borrowed On</th>
                         <th>Returned?</th>
+                        <th>Remaining Days</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -75,6 +76,27 @@
                                 else
                                 {
                                     <span class="badge bg-warning text-dark">No</span>
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    if (!borrow.IsReturned)
+                                    {
+                                        int remainingDays = (borrow.returnDate - DateTime.Now).Days;
+
+                                        if (remainingDays >= 0)
+                                        {
+                                            <span class="badge bg-primary">@remainingDays day(s)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Overdue</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Returned</span>
+                                    }
                                 }
                             </td>
                             <td>
@@ -102,3 +124,5 @@
     }
 
 </div>
+
+    <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-outline-primary btn-rounded">Return to HomePage</a>

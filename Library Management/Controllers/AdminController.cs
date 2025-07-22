@@ -12,10 +12,12 @@ namespace Library_Management.Controllers
     public class AdminController : Controller
     {
         private readonly IBookRepo _bookRepo;
+        private readonly IBorrowRepo _borrowRepo;
 
-        public AdminController(IBookRepo bookRepo)
+        public AdminController(IBookRepo bookRepo, IBorrowRepo borrowRepo)
         {
             _bookRepo = bookRepo;
+            _borrowRepo = borrowRepo;
         }
 
         public IActionResult AdminHome()
@@ -42,6 +44,7 @@ namespace Library_Management.Controllers
                 author = dto.author,
                 quantity = dto.totalQuantity,
                 ISBN = dto.ISBN,
+                rentPrice = dto.rentPrice,
                 isActive = (int)enumActiveStatus.Active,
                 createdAt = DateTime.UtcNow
             };
@@ -134,17 +137,28 @@ namespace Library_Management.Controllers
 
         // POST: Delete Book
         [HttpPost]
+
         public async Task<IActionResult> DeleteBook(Guid id)
         {
+            if (await _bookRepo.IsBookBorrowed(id))
+            {
+                TempData["Error"] = "Cannot delete book. It is currently borrowed by one or more users.";
+                return RedirectToAction("BookList");
+            }
+
             var result = await _bookRepo.DeleteBook(id);
 
             if (result)
-                return RedirectToAction("BookList");
+            {
+                TempData["Success"] = "Book deleted successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Could not delete book.";
+            }
 
-            TempData["Error"] = "Could not delete book.";
             return RedirectToAction("BookList");
         }
-
         // GET: Filter Book List
         [HttpGet]
         public async Task<IActionResult> FilterBooks(string search)
@@ -158,5 +172,6 @@ namespace Library_Management.Controllers
             var filteredBooks = await _bookRepo.GetActiveBookListBySearch(search);
             return View("BookList", filteredBooks);
         }
+
     }
 }
