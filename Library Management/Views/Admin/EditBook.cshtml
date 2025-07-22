@@ -4,36 +4,85 @@
     ViewData["Title"] = "Edit Book";
 }
 
-<h2>Edit Book</h2>
+<style>
+    body {
+        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    }
 
-<form action="@Url.Action("EditBook", "Admin")" method="post">
-    <input type="hidden" name="Id" value="@Model.Id" />
+    .header-section {
+        background: linear-gradient(to right, #4a90e2, #6fb1fc);
+        color: white;
+        padding: 60px 0;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+    }
 
-    <div class="form-group mb-3">
-        <label for="title">Title</label>
-        <input name="title" class="form-control" placeholder="Title" value="@Model.title" />
+        .header-section h2 {
+            font-weight: 700;
+        }
+
+    .edit-form-card {
+        background-color: #ffffff;
+        border-radius: 22px;
+        padding: 40px;
+        max-width: 700px;
+        margin: 0 auto;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .btn {
+        border-radius: 22px !important;
+        padding: 10px 25px;
+        font-weight: 500;
+    }
+</style>
+
+<!-- Header Section -->
+<div class="header-section text-center mb-5">
+    <div class="container">
+        <h2 class="display-5">✏️ Edit Book</h2>
+        <p class="lead">Update the details of your book below</p>
     </div>
+</div>
 
-    <div class="form-group mb-3">
-        <label for="author">Author</label>
-        <input name="author" type="text" class="form-control" placeholder="Author" value="@Model.author" />
-    </div>
+<!-- Edit Form Card -->
+<div class="edit-form-card">
+    <form action="@Url.Action("EditBook", "Admin")" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
 
-    <div class="form-group mb-3">
-        <label for="ISBN">ISBN</label>
-        <input name="ISBN" type="text" class="form-control" placeholder="ISBN" value="@Model.ISBN" />
-    </div>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input name="title" class="form-control" placeholder="Title" value="@Model.title" />
+        </div>
 
-    <div class="form-group mb-3">
-        <label for="totalQuantity">Quantity</label>
-        <input name="totalQuantity" type="number" class="form-control" placeholder="Quantity" value="@Model.totalQuantity" />
-    </div>
+        <div class="mb-3">
+            <label for="author" class="form-label">Author</label>
+            <input name="author" type="text" class="form-control" placeholder="Author" value="@Model.author" />
+        </div>
 
-    <div class="form-group mb-3">
-        <label for="rentPrice">Rent Price</label>
-        <input name="rentPrice" type="number" class="form-control" placeholder="Rent Price" value="@Model.rentPrice" />
-    </div>
+        <div class="mb-3">
+            <label for="ISBN" class="form-label">ISBN</label>
+            <input name="ISBN" type="text" class="form-control" placeholder="ISBN" value="@Model.ISBN" />
+        </div>
 
-    <button type="submit" class="btn btn-success">Update</button>
-    <a href="@Url.Action("BookList", "Admin")" class="btn btn-secondary ms-2">Cancel</a>
-</form>
+        <div class="mb-3">
+            <label for="totalQuantity" class="form-label">Quantity</label>
+            <input name="totalQuantity" type="number" class="form-control" placeholder="Quantity" value="@Model.totalQuantity" />
+        </div>
+
+        <div class="mb-3">
+            <label for="rentPrice" class="form-label">Rent Price</label>
+            <input name="rentPrice" type="number" class="form-control" placeholder="Rent Price" value="@Model.rentPrice" />
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success">💾 Update</button>
+            <a href="@Url.Action("BookList", "Admin")" class="btn btn-outline-secondary">↩ Cancel</a>
+        </div>
+    </form>
+</div>

@@ -4,65 +4,121 @@
     ViewData["Title"] = "Manage Books";
 }
 
-<h2 class="text-center">Admin - Manage Books</h2>
+<style>
+    body {
+        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    }
 
-<div class="mb-4 text-end">
-    <form action="@Url.Action("FilterBooks", "Admin")" method="get" class="d-inline-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Search by Title or Author" />
-        <button type="submit" class="btn btn-outline-secondary">Search</button>
-    </form>
-    <a href="@Url.Action("AddBook", "Admin")" class="btn btn-primary ms-3">+ Add New Book</a>
+    .page-header {
+        background: linear-gradient(to right, #4a90e2, #6fb1fc);
+        color: white;
+        padding: 50px 0;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .rounded-input {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .btn-custom {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .custom-table {
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+        .custom-table thead {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+
+    .action-buttons a,
+    .action-buttons button {
+        border-radius: 22px;
+    }
+</style>
+
+<div class="page-header">
+    <h2 class="display-6">📘 Manage Library Books</h2>
+    <p class="lead">View, edit, and organize your book collection</p>
 </div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-warning text-center">No books found matching your search.</div>
-}
-else
-{
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>ISBN</th>
-                <th>Quantity</th>
-                <th>Rent Price</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var book in Model)
-            {
-                <tr>
-                    <td>@book.title</td>
-                    <td>@book.author</td>
-                    <td>@book.ISBN</td>
-                    <td>@book.quantity</td>
-                    <td>@book.rentPrice</td>
-                    <td>
-                        @if (book.isActive == 1)
-                        {
-                            <span class="badge bg-success">Active</span>
-                        }
-                        else if (book.isActive == 2)
-                        {
-                            <span class="badge bg-warning">Pending</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Deleted</span>
-                        }
-                    </td>
-                    <td>
-                        <a href="@Url.Action("EditBook", "Admin", new { id = book.Id })" class="btn btn-sm btn-warning">Edit</a>
-                        <form action="@Url.Action("DeleteBook", "Admin", new { id = book.Id })" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<div class="container mb-5">
+
+    <!-- Search & Add -->
+    <div class="mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <form action="@Url.Action("FilterBooks", "Admin")" method="get" class="d-flex gap-2 flex-grow-1">
+            <input type="text" name="search" class="form-control rounded-input shadow-sm" placeholder="Search by Title or Author" />
+            <button type="submit" class="btn btn-outline-secondary btn-custom">🔍 Search</button>
+        </form>
+        <a href="@Url.Action("AddBook", "Admin")" class="btn btn-primary btn-custom">➕ Add New Book</a>
+    </div>
+
+    <!-- Table -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center rounded-4 shadow-sm">No books found matching your search.</div>
+    }
+    else
+    {
+        <div class="table-responsive custom-table">
+            <table class="table table-bordered table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Quantity</th>
+                        <th>Rent Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var book in Model)
+                    {
+                        <tr>
+                            <td>@book.title</td>
+                            <td>@book.author</td>
+                            <td>@book.ISBN</td>
+                            <td>@book.quantity</td>
+                            <td>@book.rentPrice</td>
+                            <td>
+                                @if (book.isActive == 1)
+                                {
+                                    <span class="badge bg-success px-3 rounded-pill">Active</span>
+                                }
+                                else if (book.isActive == 2)
+                                {
+                                    <span class="badge bg-warning text-dark px-3 rounded-pill">Pending</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger px-3 rounded-pill">Deleted</span>
+                                }
+                            </td>
+                            <td class="action-buttons d-flex gap-2">
+                                <a href="@Url.Action("EditBook", "Admin", new { id = book.Id })" class="btn btn-sm btn-warning px-3">Edit</a>
+                                <form action="@Url.Action("DeleteBook", "Admin", new { id = book.Id })" method="post" onsubmit="return confirm('Are you sure you want to delete this book?');">
+                                    <button type="submit" class="btn btn-sm btn-danger px-3">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

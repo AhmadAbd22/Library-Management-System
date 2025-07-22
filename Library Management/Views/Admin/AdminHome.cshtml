@@ -1,22 +1,126 @@
 ﻿@{
     ViewData["Title"] = "Admin Dashboard";
+    var searchResults = ViewBag.FilteredBooks as List<Library_Management.Models.Book>;
 }
 
-<h2 class="text-center mb-4">📚 Admin Dashboard</h2>
+<style>
+    body {
+        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    }
 
-<div class="d-flex flex-column gap-3">
+    .dashboard-card {
+        background-color: #ffffff;
+        border-radius: 22px;
+        padding: 40px;
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-    <a href="@Url.Action("BookList", "Admin")" class="btn btn-outline-primary btn-lg w-100">
-         Manage Books
-    </a>
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
 
-    <a href="@Url.Action("AddBook", "Admin")" class="btn btn-outline-success btn-lg w-100">
-        Add New Book
-    </a>
+        .dashboard-card a {
+            color: #4a90e2;
+            text-decoration: none;
+        }
 
-    <form action="@Url.Action("FilterBooks", "Admin")" method="get" class="d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Search books..." />
-        <button type="submit" class="btn btn-outline-secondary">Search</button>
+    .form-control {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .btn {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .header-section {
+        background: linear-gradient(to right, #4a90e2, #6fb1fc);
+        color: white;
+        padding: 60px 0;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+    }
+
+        .header-section h2 {
+            font-weight: 700;
+        }
+
+    .book-card {
+        background-color: #f9f9f9;
+        border-radius: 16px;
+        padding: 20px;
+        border-left: 5px solid #4a90e2;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container mt-4">
+    <form method="post" action="@Url.Action("Logout", "Login")">
+        <button type="submit" class="btn btn-danger rounded-pill px-4">
+            🔓 Logout
+        </button>
     </form>
+</div>
 
+
+
+<div class="header-section text-center">
+    <div class="container">
+        <h2 class="display-5">📚 Admin Dashboard</h2>
+        <p class="lead">Manage your library and keep everything organized</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- Cards Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <a href="@Url.Action("BookList", "Admin")">📖<br />Manage Books</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <a href="@Url.Action("AddBook", "Admin")">➕<br />Add New Book</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form action="@Url.Action("AdminHome", "Admin")" method="get" class="d-flex justify-content-center">
+                <input type="text" name="search" class="form-control me-2 w-50" placeholder="Search books..." value="@Context.Request.Query["search"]" />
+                <button type="submit" class="btn btn-outline-secondary">🔍 Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="mt-4">
+        @if (searchResults != null && searchResults.Any())
+        {
+            <h5 class="mb-3">Search Results:</h5>
+            @foreach (var book in searchResults)
+            {
+                <div class="book-card">
+                    <strong>@book.title</strong><br />
+                    <span class="text-muted">Author: @book.author</span>
+                </div>
+            }
+        }
+        else if (Context.Request.Query.ContainsKey("search"))
+        {
+            <p class="text-muted">No books found matching your search.</p>
+        }
+    </div>
 </div>

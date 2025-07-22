@@ -118,6 +118,18 @@ namespace Library_Management.Controllers
             return View(books);
         }
 
+        public IActionResult AdminDashboard(string search)
+        {
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var results = _bookRepo.GetActiveBookListBySearch(search); 
+                ViewBag.FilteredBooks = results;
+            }
+
+            return View();
+        }
+
+
 
 
         // POST: Delete Book

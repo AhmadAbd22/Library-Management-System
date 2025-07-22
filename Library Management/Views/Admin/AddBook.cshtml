@@ -2,60 +2,111 @@
 
 @{
     ViewData["Title"] = "Add Book";
-    ViewData["Successful"] = "Book Added Successfully";
 }
 
-<h2>Add New Book</h2>
-@if (!ViewData.ModelState.IsValid)
-{
-    <ul class="text-danger">
-        @foreach (var modelState in ViewData.ModelState)
-        {
-            foreach (var error in modelState.Value.Errors)
-            {
-                <li>@error.ErrorMessage</li>
-            }
+<style>
+    body {
+        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 22px;
+        padding: 40px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: auto;
+    }
+
+    .form-control {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .btn {
+        border-radius: 22px !important;
+        padding: 10px 24px;
+    }
+
+    .header-section {
+        background: linear-gradient(to right, #4a90e2, #6fb1fc);
+        color: white;
+        padding: 60px 0;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+        margin-bottom: 40px;
+    }
+
+        .header-section h2 {
+            font-weight: 700;
         }
-    </ul>
-}
-<form action="@Url.Action("AddBook","Admin")" method="post" class="mt-4"> 
+
+    .validation-summary-errors {
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="header-section text-center">
+    <h2 class="display-5">➕ Add New Book</h2>
+    <p class="lead">Enter book details to add it to the library</p>
+</div>
+
+<div class="form-container">
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="validation-summary-errors">
+            <ul>
+                @foreach (var modelState in ViewData.ModelState)
+                {
+                    foreach (var error in modelState.Value.Errors)
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success">@TempData["Success"]</div>
     }
-    <div>
-        <label for="title" class="form-label"></label>
-        <input for="title" name="title" class="form-control" placeholder="Book Title" />
+
+    <form action="@Url.Action("AddBook", "Admin")" method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">Book Title</label>
+            <input id="title" name="title" class="form-control" placeholder="Enter book title" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="author" class="form-label">Author</label>
+            <input id="author" name="Author" class="form-control" placeholder="Enter author name" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="ISBN" class="form-label">ISBN</label>
+            <input id="ISBN" name="ISBN" class="form-control" placeholder="Enter ISBN" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="totalQuantity" class="form-label">Quantity</label>
+            <input id="totalQuantity" name="totalQuantity" type="number" class="form-control" placeholder="Enter total quantity" required />
+        </div>
+
+        <div class="mb-4">
+            <label for="rentPrice" class="form-label">Rent Price</label>
+            <input id="rentPrice" name="rentPrice" type="number" class="form-control" placeholder="Enter rent price" required />
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Add Book</button>
+            <button type="reset" class="btn btn-secondary">Cancel</button>
+        </div>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="@Url.Action("AdminHome", "Admin")" class="btn btn-outline-secondary">🏠 Go to Dashboard</a>
     </div>
-
-    <div class="mb-3">
-        <label for="author" class="form-label"></label>
-        <input for="author" name="Author" class="form-control" placeholder="Author" />
-    </div>
-
-    <div class="mb-3">
-        <label for="ISBN" class="form-label"></label>
-        <input for="ISBN" name="ISBN" class="form-control" placeholder="ISBN" />
-    </div>
-
-    <div class="mb-3">
-        <label for="totalQuantity" class="form-label"></label>
-        <input for="totalQuantity" name="totalQuantity" type="number" class="form-control"  placeholder="Quantity"/>
-    </div>
-
-    <div class="mb-3">
-        <label for="rentPrice" class="form-label"></label>
-        <input for="rentPrice" name="rentPrice" type="number" class="form-control" placeholder="Rent Price" />
-    </div>
-
-    <button type="submit" class="btn btn-success" action="@Url.Action("AddBook", "Admin")">Add Book</button>
-    <button type="reset" class="btn btn-secondary ms-4"> Cancel </button>
-
-</form>
-
-
-
-<div class="alert-light">
-    <a href="@Url.Action("AdminHome", "Admin")" class="btn btn-secondary mt-4">Go to Home
-    </a>
 </div>

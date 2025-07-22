@@ -4,6 +4,7 @@ using Library_Management.Models.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Library_Management.Models.Dtos;
 using Library_Management.HelpingClasses;
+using Library_Management.Helping_Classes;
 
 namespace Library_Management.Controllers
 {
@@ -26,13 +27,13 @@ namespace Library_Management.Controllers
             if (!ModelState.IsValid)
                 return View(signup);
 
-            var existingUser = await _userRepo.GetUserByEmail(signup.Email);  // check if user exists
+            var existingUser = await _userRepo.GetUserByEmail(signup.Email);  
             if (existingUser != null)
             {
                 ModelState.AddModelError("Email", "Email is already registered.");
                 return View(signup);
             }
-            var user = new Models.User  //create new user
+            var user = new Models.User  
             {
                 Id = Guid.NewGuid(),
                 email = signup.Email,
@@ -41,7 +42,7 @@ namespace Library_Management.Controllers
                 address = signup.Address,
                 city = signup.City,
                 phoneNumber = signup.Phone,
-                password = signup.Password,
+                password = PasswordHelper.HashPassword(signup.Password),,
                 isActive = (int)enumActiveStatus.Active,
                 role = (int)enumRole.Customer,
                 createdAt = DateTime.UtcNow

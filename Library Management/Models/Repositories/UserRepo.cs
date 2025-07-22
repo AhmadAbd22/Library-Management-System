@@ -41,7 +41,6 @@ namespace Library_Management.Models.Repositories
         Task<IEnumerable<BorrowedBooks>> GetUserBorrows(Guid userId);
         Task<IEnumerable<BorrowedBooks>> GetAllBorrows();
         Task<int> GetTotalBorrowedCount();
-
     }
 
     public class BorrowRepo : IBorrowRepo
@@ -386,6 +385,14 @@ public class BookRepo : IBookRepo
         {
             return false;
         }
+    }
+
+    public List<Book> GetBooksBySearch(string search)
+    {
+        search = search.ToLower().Trim();
+        return _context.Books
+            .Where(b => b.title.ToLower().Contains(search) || b.author.ToLower().Contains(search))
+            .ToList();
     }
 
 }

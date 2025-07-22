@@ -4,71 +4,117 @@
     var borrowedBookIds = ViewBag.BorrowedBookIds as List<Guid>;
 }
 
-<h1 class="text-left mb-4">Home Page</h1>
+<style>
+    body {
+        background: linear-gradient(to right, #f2f6ff, #d9e4f5);
+    }
 
-<h4>Available Books</h4>
+    .page-header {
+        background: linear-gradient(to right, #4a90e2, #6fb1fc);
+        color: white;
+        padding: 50px 0;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
 
-<form method="get" class="d-flex mb-4" role="search" action="@Url.Action("UserHome", "UserHome")">
+    .custom-table {
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
 
-    <input type="text" name="search" placeholder="Search books..." class="form-control rounded-pill w-50" />
-    <button type="submit" class="btn btn-primary ms-3 rounded-pill">Search</button>
-</form>
+        .custom-table thead {
+            background-color: #4a90e2;
+            color: white;
+        }
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (Model == null || !Model.Any())
-{
-    <div class="alert alert-warning">No books found matching your search.</div>
-}
-else
-{
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var book in Model)
-            {
-                <tr>
-                    <td>@book.title</td>
-                    <td>@book.author</td>
-                    <td>@book.rentPrice Rs</td>
-                    <td>
-                        @if (borrowedBookIds != null && borrowedBookIds.Contains(book.Id))
-                        {
-                            <button class="btn btn-secondary btn-sm rounded-pill" disabled>
-                                Borrowed
-                            </button>
-                        }
-                        else
-                        {
-                            <form method="post" action="@Url.Action("BorrowBook", "UserHome")">
-                                <input type="hidden" name="bookId" value="@book.Id" />
-                                <button type="submit" class="btn btn-success btn-sm rounded-pill">
-                                    Borrow
-                                </button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    .btn-rounded {
+        border-radius: 20px !important;
+        padding: 6px 14px;
+    }
 
-<div class="mt-4">
-    <a href="@Url.Action("BorrowedBooks", "UserHome")" class="btn btn-outline-primary rounded-pill">
-        View Borrowed Books
-    </a>
+    .search-form input {
+        max-width: 400px;
+    }
+
+    .alert {
+        border-radius: 22px;
+    }
+</style>
+
+<div class="page-header">
+    <h1 class="display-6">📚 Welcome to the Library</h1>
+    <p class="lead">Browse and borrow your favorite books</p>
+</div>
+
+<div class="container mb-5">
+
+    <form method="get" class="d-flex mb-4 search-form" role="search" action="@Url.Action("UserHome", "UserHome")">
+        <input type="text" name="search" placeholder="Search books..." class="form-control rounded-pill shadow-sm" />
+        <button type="submit" class="btn btn-primary ms-3 btn-rounded shadow-sm">Search</button>
+    </form>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success shadow-sm">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
+    }
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning text-center shadow-sm">No books found matching your search.</div>
+    }
+    else
+    {
+        <div class="table-responsive custom-table">
+            <table class="table table-bordered table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var book in Model)
+                    {
+                        <tr>
+                            <td>@book.title</td>
+                            <td>@book.author</td>
+                            <td>@book.rentPrice Rs</td>
+                            <td>
+                                @if (borrowedBookIds != null && borrowedBookIds.Contains(book.Id))
+                                {
+                                    <button class="btn btn-secondary btn-sm btn-rounded" disabled>
+                                        Borrowed
+                                    </button>
+                                }
+                                else
+                                {
+                                    <form method="post" action="@Url.Action("BorrowBook", "UserHome")" class="d-inline">
+                                        <input type="hidden" name="bookId" value="@book.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm btn-rounded">
+                                            Borrow
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="mt-4 text-center">
+        <a href="@Url.Action("BorrowedBooks", "UserHome")" class="btn btn-outline-primary btn-rounded">
+            View Borrowed Books
+        </a>
+    </div>
+
 </div>

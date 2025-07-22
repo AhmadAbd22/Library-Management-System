@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Library_Management.HelpingClasses;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Library_Management.Helping_Classes;
 
 namespace Library_Management.Controllers
 {
@@ -36,7 +37,8 @@ namespace Library_Management.Controllers
                 return RedirectToAction("Login");
             }
 
-            if (user.password != login.Password)
+            string hashedInputPassword = PasswordHelper.HashPassword(login.Password);
+            if (user.password != hashedInputPassword)
             {
                 TempData["Error"] = "Incorrect password.";
                 return RedirectToAction("Login");
@@ -53,8 +55,7 @@ namespace Library_Management.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", "Login");
         }
 
         [HttpGet]

@@ -2,14 +2,64 @@
     ViewData["Title"] = "Login Page";
 }
 
+<style>
+    body {
+        background: linear-gradient(to right, #d9e4f5, #f2f6ff);
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 22px;
+        padding: 40px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+        border-radius: 22px !important;
+        padding: 10px 20px;
+    }
+
+    .btn-primary {
+        background-color: #4a90e2;
+        border-color: #4a90e2;
+        border-radius: 22px;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #357ab8;
+            border-color: #357ab8;
+        }
+
+    .header-section {
+        background: linear-gradient(to right, #4a90e2, #6fb1fc);
+        color: white;
+        padding: 60px 0;
+        border-bottom-left-radius: 60px;
+        border-bottom-right-radius: 60px;
+    }
+
+        .header-section h2 {
+            font-weight: 700;
+        }
+</style>
+
+<div class="header-section text-center">
+    <div class="container">
+        <h2 class="display-5">Library Management System</h2>
+        <p class="lead">Welcome back! Please log in to continue.</p>
+    </div>
+</div>
+
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 bg-light p-5 rounded-4 shadow">
+        <div class="col-md-8 form-container">
             <h4 class="mb-4 text-center">Login To Your Account</h4>
 
             @if (TempData["Error"] != null)
             {
-                <div class="alert alert-danger text-center">
+                <div class="alert alert-danger text-center rounded-3">
                     @TempData["Error"]
                 </div>
             }
@@ -29,7 +79,6 @@
                     <button type="submit" class="btn btn-primary btn-block">Log In</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
