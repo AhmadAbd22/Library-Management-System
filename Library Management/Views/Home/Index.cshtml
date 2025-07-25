@@ -4,6 +4,7 @@
 
 <style>
     body {
+        font-family: 'SF Pro Display', sans-serif;
         background: linear-gradient(to right, #d9e4f5, #f2f6ff);
     }
 
@@ -81,6 +82,11 @@
                     <input type="email" name="Email" class="form-control" placeholder="Email" required />
                 </div>
 
+                <div class="mb-4">
+                    <label for="Password" class="form-label">Password</label>
+                    <input type="password" name="Password" class="form-control" placeholder="Password" required />
+                </div>
+
                 <div class="mb-3">
                     <label for="Phone" class="form-label">Phone Number</label>
                     <input type="tel" name="Phone" class="form-control" placeholder="Phone Number" required />
@@ -96,11 +102,6 @@
                     <input type="text" name="City" class="form-control" placeholder="City" required />
                 </div>
 
-                <div class="mb-4">
-                    <label for="Password" class="form-label">Password</label>
-                    <input type="password" name="Password" class="form-control" placeholder="Password" required />
-                </div>
-
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
                 </div>
@@ -108,7 +109,7 @@
                 <div class="text-center mt-3">
                     <p class="text-muted">
                         Already have an account?
-                        <a href="@Url.Action("login", "Login")" class="text-decoration-none">Login</a>
+                        <a href="@Url.Action("Login", "Login")" class="text-decoration-none">Login</a>
                     </p>
                 </div>
             </form>
