@@ -19,7 +19,7 @@ namespace Library_Management.Controllers
         //Sign Up//
         public IActionResult SignUp()
         {
-            return View();
+            return RedirectToAction("Home","Index");
         }
         [HttpPost]
         public async Task<IActionResult> Signup(SignUpDto signup)

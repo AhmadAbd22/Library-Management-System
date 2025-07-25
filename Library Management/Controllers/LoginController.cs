@@ -52,10 +52,9 @@ namespace Library_Management.Controllers
                 return RedirectToAction("UserHome", "UserHome");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            return RedirectToAction("Login", "Login");
+            return RedirectToAction("Index", "SignUp");
         }
 
         [HttpGet]
