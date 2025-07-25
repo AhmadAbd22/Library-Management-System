@@ -6,6 +6,7 @@ I have created this Library Management System Project on a small scale with Auth
 - Role Based Users (Admin and Customer)
 - Search, Add, Edit, Delete Books (Admin View)
 - Search, Borrow, Return Books (User View)
+- Authentication Based Login and Cookies Storing for session management
 
 ### To-Be Added:
 Storing and Search result with Pictures of the Books.
